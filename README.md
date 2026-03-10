@@ -14,20 +14,20 @@ Aplicação Flutter — Atividades 04 e 05 — Desenvolvimento de Dispositivos M
 
 ## Como rodar
 
-\\\ash
+
 flutter pub get
 flutter run
-\\\
+
 
 ## Como rodar os testes
 
-\\\ash
+
 flutter test
-\\\
+
 
 ## Arquitetura
 
-\\\
+
 lib/
 ├── core/
 │   ├── errors/failure.dart
@@ -45,15 +45,14 @@ lib/
 │   ├── viewmodels/product_viewmodel.dart
 │   └── pages/product_page.dart
 └── main.dart
-\\\
+
 
 ### Regra de dependência
 
-\\\
+
 presentation → domain
 data         → domain
 domain       → nenhuma camada
-\\\
 
 ---
 
