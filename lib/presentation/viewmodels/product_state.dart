@@ -1,23 +1,20 @@
 import '../../domain/entities/product.dart';
 
-/// Representa o estado imutável da tela de produtos.
-/// Sempre que o estado muda, uma nova instância é criada via [copyWith],
-/// evitando efeitos colaterais e tornando o comportamento previsível.
+/// Estado imutável da tela de produtos.
+///
+/// Representa explicitamente os três estados da interface:
+/// - Carregando: [isLoading] == true
+/// - Erro:       [error] != null
+/// - Sucesso:    [products] não vazio
 class ProductState {
-  /// Indica se uma operação assíncrona está em andamento.
   final bool isLoading;
-
-  /// Lista de produtos atualmente disponíveis na interface.
   final List<Product> products;
-
-  /// Lista filtrada de produtos (por categoria selecionada).
   final List<Product> filtered;
-
-  /// Categoria atualmente selecionada para filtro. Nulo = todas.
   final String? selectedCategory;
-
-  /// Mensagem de erro caso alguma operação falhe.
   final String? error;
+
+  /// Indica se os dados exibidos vieram do cache (modo offline).
+  final bool fromCache;
 
   const ProductState({
     this.isLoading = false,
@@ -25,15 +22,16 @@ class ProductState {
     this.filtered = const [],
     this.selectedCategory,
     this.error,
+    this.fromCache = false,
   });
 
-  /// Cria uma cópia do estado alterando apenas os campos informados.
   ProductState copyWith({
     bool? isLoading,
     List<Product>? products,
     List<Product>? filtered,
     String? selectedCategory,
     String? error,
+    bool? fromCache,
   }) {
     return ProductState(
       isLoading: isLoading ?? this.isLoading,
@@ -41,6 +39,7 @@ class ProductState {
       filtered: filtered ?? this.filtered,
       selectedCategory: selectedCategory ?? this.selectedCategory,
       error: error,
+      fromCache: fromCache ?? this.fromCache,
     );
   }
 }
