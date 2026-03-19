@@ -2,14 +2,8 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/product.dart';
 import '../viewmodels/product_state.dart';
 import '../viewmodels/product_viewmodel.dart';
+import 'product_detail_page.dart';
 
-/// Tela principal que exibe a lista de produtos.
-///
-/// [RESPOSTA À REFLEXÃO 3]
-/// Se a UI acessasse o DataSource diretamente, ela dependeria de Dio,
-/// HTTP e JSON. Qualquer mudança no DataSource quebraria a interface.
-/// A lógica de cache e erro ficaria espalhada na UI, tornando o código
-/// impossível de testar e difícil de manter.
 class ProductPage extends StatefulWidget {
   final ProductViewModel viewModel;
   const ProductPage({super.key, required this.viewModel});
@@ -42,8 +36,6 @@ class _ProductPageState extends State<ProductPage> {
       body: ValueListenableBuilder<ProductState>(
         valueListenable: widget.viewModel.state,
         builder: (context, state, _) {
-
-          // ---- Estado: carregando ----
           if (state.isLoading) {
             return const Center(
               child: Column(
@@ -57,7 +49,6 @@ class _ProductPageState extends State<ProductPage> {
             );
           }
 
-          // ---- Estado: erro ----
           if (state.error != null) {
             return Center(
               child: Padding(
@@ -85,36 +76,50 @@ class _ProductPageState extends State<ProductPage> {
             );
           }
 
-          // ---- Estado: vazio ----
           if (state.products.isEmpty) {
             return const Center(child: Text('Nenhum produto encontrado.'));
           }
 
-          // ---- Estado: sucesso ----
           return Column(
             children: [
-              // Banner quando dados vêm do cache
               if (state.fromCache)
                 Container(
                   width: double.infinity,
                   color: Colors.orange.shade100,
-                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 6, horizontal: 16),
                   child: const Row(
                     children: [
-                      Icon(Icons.offline_bolt, size: 16, color: Colors.orange),
+                      Icon(Icons.offline_bolt,
+                          size: 16, color: Colors.orange),
                       SizedBox(width: 8),
                       Text('Exibindo dados do cache (sem conexão)',
-                          style: TextStyle(fontSize: 12, color: Colors.orange)),
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.orange)),
                     ],
                   ),
                 ),
-              _CategoryFilter(viewModel: widget.viewModel, state: state),
+              _CategoryFilter(
+                  viewModel: widget.viewModel, state: state),
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(8),
                   itemCount: state.filtered.length,
-                  itemBuilder: (context, index) =>
-                      _ProductCard(product: state.filtered[index]),
+                  itemBuilder: (context, index) => _ProductCard(
+                    product: state.filtered[index],
+                    onTap: () {
+                      // Navigator.push() navega para a tela de detalhes
+                      // passando o produto selecionado
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ProductDetailPage(
+                            product: state.filtered[index],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
@@ -134,7 +139,8 @@ class _CategoryFilter extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
           Padding(
@@ -150,7 +156,8 @@ class _CategoryFilter extends StatelessWidget {
                 child: FilterChip(
                   label: Text(cat),
                   selected: state.selectedCategory == cat,
-                  onSelected: (_) => viewModel.filterByCategory(cat),
+                  onSelected: (_) =>
+                      viewModel.filterByCategory(cat),
                 ),
               )),
         ],
@@ -161,53 +168,86 @@ class _CategoryFilter extends StatelessWidget {
 
 class _ProductCard extends StatelessWidget {
   final Product product;
-  const _ProductCard({required this.product});
+  final VoidCallback onTap;
+
+  const _ProductCard({required this.product, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      margin:
+          const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                product.image, width: 80, height: 80, fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => const Icon(
-                    Icons.image_not_supported, size: 80, color: Colors.grey),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap, // toque abre a tela de detalhes
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  product.image,
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const Icon(
+                      Icons.image_not_supported,
+                      size: 80,
+                      color: Colors.grey),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(product.title,
-                      maxLines: 2, overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.indigo.shade50,
-                      borderRadius: BorderRadius.circular(20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(product.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14)),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.indigo.shade50,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(product.category,
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.indigo.shade700)),
                     ),
-                    child: Text(product.category,
-                        style: TextStyle(fontSize: 11, color: Colors.indigo.shade700)),
-                  ),
-                  const SizedBox(height: 6),
-                  Text('USD ${product.price.toStringAsFixed(2)}',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary)),
-                ],
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'USD ${product.price.toStringAsFixed(2)}',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary),
+                        ),
+                        const Icon(Icons.chevron_right,
+                            color: Colors.grey),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

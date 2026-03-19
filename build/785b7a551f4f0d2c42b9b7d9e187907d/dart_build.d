@@ -1,0 +1,1 @@
+ D:\\CoisasDoTales\\FaculEngSoft\\Quinto\ Período\\Desenvolvimento\ de\ Dispositivos\ Móveis\ 2\\Atividade\ 07\\mobile_arquitetura_01\\build\\785b7a551f4f0d2c42b9b7d9e187907d\\dart_build_result.json: 
