@@ -1,6 +1,6 @@
 # mobile_arquitetura_01
 
-Aplicação Flutter — Atividades 04 e 05 — Desenvolvimento de Dispositivos Móveis II.
+Aplicação Flutter — Atividades 04, 05 e 07 — Desenvolvimento de Dispositivos Móveis II.
 
 ## Funcionalidades
 
