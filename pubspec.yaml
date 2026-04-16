@@ -1,5 +1,5 @@
 name: mobile_arquitetura_01
-description: Aplicação Flutter com Arquitetura em Camadas - Atividade 04
+description: Aplicação Flutter consolidada - Atividades 04, 05, 06, 08, 09
 publish_to: 'none'
 version: 1.0.0+1
 environment:
@@ -8,6 +8,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^5.4.0
+  provider: ^6.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

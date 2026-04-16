@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../models/product.dart';
-import '../providers/product_provider.dart';
+import '../../domain/entities/product.dart';
+import '../viewmodels/product_viewmodel.dart';
 
-class ProductFormScreen extends StatefulWidget {
+class ProductFormPage extends StatefulWidget {
+  final ProductViewModel viewModel;
   final Product? product;
-  const ProductFormScreen({super.key, this.product});
+  const ProductFormPage({super.key, required this.viewModel, this.product});
 
   @override
-  State<ProductFormScreen> createState() => _State();
+  State<ProductFormPage> createState() => _State();
 }
 
-class _State extends State<ProductFormScreen> {
+class _State extends State<ProductFormPage> {
   final _key = GlobalKey<FormState>();
   bool _saving = false;
   late final _title = TextEditingController(text: widget.product?.title ?? '');
@@ -32,20 +32,25 @@ class _State extends State<ProductFormScreen> {
     if (!_key.currentState!.validate()) return;
     setState(() => _saving = true);
     final p = Product(
-      id: widget.product?.id,
+      id: widget.product?.id ?? 0,
       title: _title.text.trim(),
       price: double.parse(_price.text.trim()),
       description: _desc.text.trim(),
       category: _cat.text.trim(),
-      image: _img.text.trim().isEmpty ? 'https://fakestoreapi.com/img/81fAn1cxK+L._AC_UY879_.jpg' : _img.text.trim(),
+      image: _img.text.trim().isEmpty
+          ? 'https://fakestoreapi.com/img/81fAn1cxK+L._AC_UY879_.jpg'
+          : _img.text.trim(),
     );
     final ok = _editing
-        ? await context.read<ProductProvider>().updateProduct(p)
-        : await context.read<ProductProvider>().addProduct(p);
+        ? await widget.viewModel.updateProduct(p)
+        : await widget.viewModel.addProduct(p);
     if (!mounted) return;
     setState(() => _saving = false);
     if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_editing ? 'Atualizado!' : 'Criado!'), backgroundColor: Colors.green));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(_editing ? 'Produto atualizado!' : 'Produto criado!'),
+        backgroundColor: Colors.green,
+      ));
       Navigator.pop(context);
     }
   }
@@ -58,7 +63,11 @@ class _State extends State<ProductFormScreen> {
         keyboardType: type,
         maxLines: lines,
         validator: val ?? (v) => v == null || v.trim().isEmpty ? 'Campo obrigatório' : null,
-        decoration: InputDecoration(labelText: label, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), filled: true),
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+        ),
       ),
     );
   }
@@ -66,7 +75,10 @@ class _State extends State<ProductFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_editing ? 'Editar Produto' : 'Novo Produto'), backgroundColor: Theme.of(context).colorScheme.inversePrimary),
+      appBar: AppBar(
+        title: Text(_editing ? 'Editar Produto' : 'Novo Produto'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -83,9 +95,16 @@ class _State extends State<ProductFormScreen> {
             _field(_img, 'URL da imagem (opcional)', val: (_) => null),
             ElevatedButton.icon(
               onPressed: _saving ? null : _submit,
-              icon: _saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : Icon(_editing ? Icons.save : Icons.add),
+              icon: _saving
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                  : Icon(_editing ? Icons.save : Icons.add),
               label: Text(_saving ? 'Salvando...' : (_editing ? 'Salvar' : 'Criar')),
-              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.indigo, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
             ),
           ]),
         ),

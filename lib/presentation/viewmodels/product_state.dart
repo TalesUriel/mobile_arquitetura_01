@@ -1,19 +1,11 @@
 import '../../domain/entities/product.dart';
 
-/// Estado imutável da tela de produtos.
-///
-/// Representa explicitamente os três estados da interface:
-/// - Carregando: [isLoading] == true
-/// - Erro:       [error] != null
-/// - Sucesso:    [products] não vazio
 class ProductState {
   final bool isLoading;
   final List<Product> products;
   final List<Product> filtered;
   final String? selectedCategory;
   final String? error;
-
-  /// Indica se os dados exibidos vieram do cache (modo offline).
   final bool fromCache;
 
   const ProductState({
@@ -24,6 +16,9 @@ class ProductState {
     this.error,
     this.fromCache = false,
   });
+
+  List<Product> get favorites => products.where((p) => p.favorite).toList();
+  int get favoriteCount => favorites.length;
 
   ProductState copyWith({
     bool? isLoading,

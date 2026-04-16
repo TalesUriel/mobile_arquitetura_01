@@ -1,6 +1,3 @@
-/// Entidade de domínio que representa um produto.
-/// Esta classe pertence exclusivamente à camada de domínio
-/// e não possui dependência de frameworks, APIs ou banco de dados.
 class Product {
   final int id;
   final String title;
@@ -8,13 +5,35 @@ class Product {
   final String image;
   final String category;
   final String description;
+  bool favorite;
 
-  const Product({
+  Product({
     required this.id,
     required this.title,
     required this.price,
     required this.image,
     required this.category,
     required this.description,
+    this.favorite = false,
   });
+
+  Product copyWith({
+    int? id,
+    String? title,
+    double? price,
+    String? image,
+    String? category,
+    String? description,
+    bool? favorite,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      price: price ?? this.price,
+      image: image ?? this.image,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      favorite: favorite ?? this.favorite,
+    );
+  }
 }
