@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'presentation/pages/home_page.dart';
+import 'pages/login_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,14 +11,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fake Store',
+      title: 'Projeto Produtos com Autenticação',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        colorSchemeSeed: Colors.blue,
         useMaterial3: true,
       ),
-      // Tela inicial da aplicação
-      home: const HomePage(),
+      home: const LoginPage(),
     );
   }
 }

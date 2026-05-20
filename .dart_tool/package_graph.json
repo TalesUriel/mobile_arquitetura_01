@@ -8,7 +8,9 @@
       "version": "1.0.0+1",
       "dependencies": [
         "dio",
-        "flutter"
+        "flutter",
+        "http",
+        "provider"
       ],
       "devDependencies": [
         "flutter_lints",
@@ -269,6 +271,32 @@
       "name": "vm_service",
       "version": "15.0.2",
       "dependencies": []
+    },
+    {
+      "name": "provider",
+      "version": "6.1.5+1",
+      "dependencies": [
+        "collection",
+        "flutter",
+        "nested"
+      ]
+    },
+    {
+      "name": "nested",
+      "version": "1.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "http",
+      "version": "1.6.0",
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
+      ]
     }
   ],
   "configVersion": 1
