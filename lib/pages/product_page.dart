@@ -17,6 +17,9 @@ class _ProductPageState extends State<ProductPage> {
 
   Future<List<Product>>? _futureProducts;
 
+  // Controle de favoritos: armazena os IDs dos produtos favoritados
+  final Set<int> _favoriteIds = {};
+
   @override
   void initState() {
     super.initState();
@@ -26,6 +29,16 @@ class _ProductPageState extends State<ProductPage> {
   void _refresh() {
     setState(() {
       _futureProducts = _service.getProducts();
+    });
+  }
+
+  void _toggleFavorite(int productId) {
+    setState(() {
+      if (_favoriteIds.contains(productId)) {
+        _favoriteIds.remove(productId);
+      } else {
+        _favoriteIds.add(productId);
+      }
     });
   }
 
@@ -121,7 +134,26 @@ class _ProductPageState extends State<ProductPage> {
                   subtitle: Text(
                     'R\$ ${product.price.toStringAsFixed(2)} | Estoque: ${product.stock}',
                   ),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          _favoriteIds.contains(product.id)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: _favoriteIds.contains(product.id)
+                              ? Colors.red
+                              : null,
+                        ),
+                        tooltip: _favoriteIds.contains(product.id)
+                            ? 'Remover dos favoritos'
+                            : 'Adicionar aos favoritos',
+                        onPressed: () => _toggleFavorite(product.id),
+                      ),
+                      const Icon(Icons.chevron_right),
+                    ],
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,
