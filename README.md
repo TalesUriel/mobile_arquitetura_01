@@ -1,93 +1,62 @@
 # mobile_arquitetura_01
 
-Aplicação Flutter — Atividades 04, 05 e 07 — Desenvolvimento de Dispositivos Móveis II.
+Aplicação Flutter consolidada — Desenvolvimento de Dispositivos Móveis II.
+
+Implementa autenticação com a [DummyJSON API](https://dummyjson.com), listagem e detalhes de produtos, controle de favoritos e fluxo completo de login/logout.
 
 ## Funcionalidades
 
-- Consome a [Fake Store API](https://fakestoreapi.com/products)
-- Lista produtos com imagem, título, categoria e preço
-- Filtro por categoria
-- Estado explícito da interface (loading / erro / sucesso)
-- Cache local com fallback automático quando a API está indisponível
-- Banner visual indicando dados offline
-- Testes unitários do ViewModel e do CacheDatasource
+- Tela de login com validação de campos obrigatórios
+- Autenticação via POST `/auth/login` (DummyJSON)
+- Sessão de usuário autenticado em memória
+- Bloqueio de acesso à tela de produtos sem login
+- Nome e foto do usuário exibidos no AppBar
+- Listagem de produtos via GET `/products`
+- Tela de detalhes via GET `/products/{id}`
+- Controle de favoritos com atualização automática da interface
+- Botão de logout com limpeza de sessão
+- Botão para atualizar manualmente a lista de produtos
+- Tratamento de carregamento e erros nas requisições
 
 ## Como rodar
 
-
+```
 flutter pub get
 flutter run
+```
 
+## Credenciais de teste
 
-## Como rodar os testes
+```
+Usuário: emilys
+Senha:   emilyspass
+```
 
+## Estrutura do projeto
 
-flutter test
-
-
-## Arquitetura
-
-
+```
 lib/
-├── core/
-│   ├── errors/failure.dart
-│   └── network/http_client.dart
-├── domain/
-│   ├── entities/product.dart
-│   └── repositories/product_repository.dart
-├── data/
-│   ├── models/product_model.dart
-│   ├── datasources/product_remote_datasource.dart
-│   ├── datasources/product_cache_datasource.dart
-│   └── repositories/product_repository_impl.dart
-├── presentation/
-│   ├── viewmodels/product_state.dart
-│   ├── viewmodels/product_viewmodel.dart
-│   └── pages/product_page.dart
-└── main.dart
+├── main.dart
+├── models/
+│   ├── auth_user.dart        # Modelo do usuário autenticado
+│   └── product.dart          # Modelo de produto (DummyJSON)
+├── services/
+│   ├── auth_service.dart     # POST /auth/login
+│   └── product_service.dart  # GET /products e /products/{id}
+├── session/
+│   └── session_controller.dart  # Singleton de sessão
+└── pages/
+    ├── login_page.dart           # Tela de login
+    ├── product_page.dart         # Listagem com favoritos e logout
+    └── product_detail_page.dart  # Detalhes do produto
+```
 
+## API utilizada
 
-### Regra de dependência
+[DummyJSON](https://dummyjson.com) — API de testes com suporte a autenticação, usuários e produtos.
 
-
-presentation → domain
-data         → domain
-domain       → nenhuma camada
-
----
-
-## Questionário de Reflexão — Atividade 05
-
-### 1. Em qual camada foi implementado o cache? Por quê?
-
-O cache foi implementado na **camada de dados**, como um datasource
-(ProductCacheDatasource). Essa decisão é adequada porque a camada de
-dados é responsável por decidir **como** os dados são obtidos e armazenados.
-O domínio define apenas **o que** precisa via contrato do repositório, sem
-saber se os dados vêm da rede ou do cache. Isso preserva a independência
-do domínio e o baixo acoplamento entre camadas. Para uma solução persistente,
-bastaria trocar a implementação por SharedPreferences ou SQLite sem alterar
-nenhuma outra camada.
-
-### 2. Por que o ViewModel não deve realizar chamadas HTTP diretamente?
-
-O ViewModel pertence à camada de apresentação e deve apenas coordenar o
-estado da interface e delegar operações ao domínio. Se fizesse chamadas HTTP
-diretamente, estaria acoplado a detalhes de infraestrutura, tornando os
-testes impossíveis sem acesso real à rede, dificultando a manutenção e
-violando a separação de responsabilidades da arquitetura em camadas.
-
-### 3. O que poderia acontecer se a interface acessasse o DataSource diretamente?
-
-A interface passaria a depender de detalhes técnicos como Dio, HTTP e JSON.
-Qualquer mudança no DataSource exigiria mudanças na UI. A lógica de cache,
-retry e tratamento de erro ficaria espalhada na camada de apresentação,
-tornando o código impossível de testar isoladamente e muito difícil de manter.
-
-### 4. Como essa arquitetura facilitaria a substituição da API por banco de dados local?
-
-Bastaria criar um novo datasource (ex: ProductLocalDatasource) e injetá-lo
-no ProductRepositoryImpl no lugar do ProductRemoteDatasource. O contrato
-do repositório permaneceria o mesmo, e nenhuma outra camada precisaria ser
-alterada — o ViewModel, a UI e o domínio continuariam funcionando sem
-nenhuma modificação.
+| Endpoint | Método | Uso |
+|---|---|---|
+| `/auth/login` | POST | Autenticação |
+| `/products` | GET | Listagem de produtos |
+| `/products/{id}` | GET | Detalhes do produto |
